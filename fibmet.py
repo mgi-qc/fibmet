@@ -13,6 +13,7 @@ date = datetime.datetime.now().strftime("%m%d%y")
 
 woid_list = args.w.split(',')
 outfile = f'{woid_list[0]}.prodmetrics.{date}.tsv'
+dup_check = {}
 
 if os.path.exists(outfile):
     os.remove(outfile)
@@ -72,6 +73,11 @@ for woid in woid_list:
                     results['WGS HET_SNP_Q'] = line['HET_SNP_Q']
                     results['WGS HET_SNP_SENSITIVITY'] = line['HET_SNP_SENSITIVITY']
                     results['Mean Coverage (Raw)'] = line['MEAN_COVERAGE']
+
+                    if line['DNA'] not in dup_check:
+                        dup_check[line['DNA']] = line['DNA']
+                    else:
+                        print('Duplicate sample found: {}'.format(line['DNA']))
 
                     sm.write(f'{line["DNA"]}\t{line["cram"]}\t{line["cram.md5"]}\n')
                     file_write(results, header)
